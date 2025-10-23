@@ -5,28 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TryCameraEnguCV"
         mc:Ignorable="d"
-        Title="Настройки" 
-        WindowStartupLocation="CenterScreen"
+        Title="Настройки"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
-        Height="700" Width="1000" ResizeMode="NoResize">
+        Height="400" Width="500" ResizeMode="NoResize">
 
     <Window.Resources>
         <!-- Конвертер bool → Visibility -->
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </Window.Resources>
 
-    <Border CornerRadius="15" Background="#2B2B3C" Padding="20" BorderBrush="#444" BorderThickness="2">
+    <Border CornerRadius="15" Background="#802B2B3C" Padding="5" BorderBrush="#444" BorderThickness="2">
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>
+                <RowDefinition Height="25"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0">
-                <Button x:Name="CloseSettingsButton" Width="50" Height="50"
+                <Button x:Name="CloseSettingsButton" Width="25" Height="25"
                 ToolTip="Открыть меню"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
@@ -60,21 +59,21 @@
                             <Style TargetType="TabItem">
                                 <Setter Property="Foreground" Value="White"/>
                                 <Setter Property="BorderBrush" Value="White"/>
-                                <Setter Property="BorderThickness" Value="3"/>
+                                <Setter Property="BorderThickness" Value="1"/>
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="TabItem">
-                                            <Border Width="255"
-                                Height="60"
-                                Margin="0,2,20,5"
-                                Background="#23232F"
+                                            <Border
+                                Height="40"
+                                Margin="0,2,0,5"
+                                Background="#4023232F"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="3">
+                                CornerRadius="3" MinWidth="50">
                                                 <TextBlock Margin="10"
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center"
-                                       FontSize="20"
+                                       FontSize="14"
                                        Foreground="{TemplateBinding Foreground}"
                                        Text="{TemplateBinding Header}" />
                                             </Border>
@@ -82,7 +81,7 @@
                                                 <Trigger Property="IsSelected" Value="True">
                                                     <Setter Property="Foreground" Value="#FFFFF700"/>
                                                     <Setter Property="BorderBrush" Value="#FFFFF700"/>
-                                                    <Setter Property="BorderThickness" Value="3"/>
+                                                    <Setter Property="BorderThickness" Value="1"/>
                                                 </Trigger>
                                             </ControlTemplate.Triggers>
                                         </ControlTemplate>
@@ -93,58 +92,63 @@
 
                         <!-- Установки изображения -->
                         <TabItem Header="Установки изображения">
-                            <Grid Margin="20,0,20,0">
+                            <Grid Margin="5,0,5,0">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="70"/>
-                                    <RowDefinition Height="70"/>
-                                    <RowDefinition Height="70"/>
-                                    <RowDefinition Height="70"/>
-                                    <RowDefinition Height="70"/>
+                                    <RowDefinition Height="50"/>
+                                    <RowDefinition Height="50"/>
+                                    <RowDefinition Height="50"/>
+                                    <RowDefinition Height="50"/>
+                                    <RowDefinition Height="50"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="110"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="40"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Яркость:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Яркость:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
                                 <Slider x:Name="BrightnessSlider" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="100" 
-                                        Value="{Binding Brightness, Mode=TwoWay}" Width="300" 
-                                        VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"/>
-                                <TextBlock Grid.Row="0" Grid.Column="2" Foreground="White" FontSize="20" VerticalAlignment="Center"
-                                        Text="{Binding Value, ElementName=BrightnessSlider, StringFormat={}{0:F0}}"/>
+                                        Value="{Binding Brightness, Mode=TwoWay}" 
+                                        VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"
+                                        TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+                                <TextBlock Grid.Row="0" Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
+                                        Text="{Binding Value, ElementName=BrightnessSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center"/>
 
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Цвет красный:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Цвет красный:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
                                 <Slider x:Name="RedColorSlider" Grid.Row="1" Grid.Column="1" Minimum="-20" Maximum="20"
-                                        Value="{Binding RedFactor, Mode=TwoWay}" Width="300" 
-                                        VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"/>
-                                <TextBlock Grid.Row="1" Grid.Column="2" Foreground="White" FontSize="20" VerticalAlignment="Center"
-                               Text="{Binding Value, ElementName=RedColorSlider, StringFormat={}{0:F0}}"/>
+                                        Value="{Binding RedFactor, Mode=TwoWay}" 
+                                        VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"
+                                        TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+                                <TextBlock Grid.Row="1" Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
+                               Text="{Binding Value, ElementName=RedColorSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center"/>
 
 
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Цвет синий:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Цвет синий:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
                                 <Slider x:Name="BlueColorSlider" Grid.Row="2" Grid.Column="1" Minimum="-20" Maximum="20"
-                                        Value="{Binding BlueFactor, Mode=TwoWay}" Width="300" 
-                                        VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"/>
-                                <TextBlock Grid.Row="2" Grid.Column="2" Foreground="White" FontSize="20" VerticalAlignment="Center"
-                               Text="{Binding Value, ElementName=BlueColorSlider, StringFormat={}{0:F0}}"/>
+                                        Value="{Binding BlueFactor, Mode=TwoWay}" 
+                                        VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"
+                                        TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+                                <TextBlock Grid.Row="2" Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
+                               Text="{Binding Value, ElementName=BlueColorSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center"/>
 
 
-                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Четкость:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
-                                <Slider x:Name="SharpnessSlider" Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="3"
-                                        Value="{Binding Sharpness, Mode=TwoWay}" Width="300" 
-                                        VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"/>
-                                <TextBlock Grid.Row="3" Grid.Column="2" Foreground="White" FontSize="20" VerticalAlignment="Center"
-                               Text="{Binding Value, ElementName=SharpnessSlider, StringFormat={}{0:F0}}"/>
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Четкость:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
+                                <Slider x:Name="SharpnessSlider" Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="20"
+                                        Value="{Binding Sharpness, Mode=TwoWay}" 
+                                        VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"
+                                        TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+                                <TextBlock Grid.Row="3" Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
+                               Text="{Binding Value, ElementName=SharpnessSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center"/>
 
 
-                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Насыщенность:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Насыщенность:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
                                 <Slider x:Name="SaturationSlider" Grid.Row="4" Grid.Column="1" Minimum="0" Maximum="2" TickFrequency="0.1"
-                                        Value="{Binding Saturation, Mode=TwoWay}" Width="300" 
-                                        VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"/>
-                                <TextBlock Grid.Row="4" Grid.Column="2" Foreground="White" FontSize="20" VerticalAlignment="Center"
-                               Text="{Binding Value, ElementName=SaturationSlider, StringFormat={}{0:F1}}"/>
+                                        Value="{Binding Saturation, Mode=TwoWay}" 
+                                        VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"
+                                        IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+                                <TextBlock Grid.Row="4" Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
+                               Text="{Binding Value, ElementName=SaturationSlider, StringFormat={}{0:F1}}" HorizontalAlignment="Center"/>
 
                             </Grid>
                         </TabItem>
@@ -155,21 +159,21 @@
                                 <!-- Конвертер из bool в Visibility -->
                                 <BooleanToVisibilityConverter x:Key="BoolToVis"/>
                             </TabItem.Resources>
-                            <Grid Margin="20,0,20,0">
+                            <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="70"/>
-                                    <RowDefinition Height="70"/>
+                                    <RowDefinition Height="30"/>
                                     <RowDefinition Height="70"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="100"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="80"/>
                                 </Grid.ColumnDefinitions>
 
                                 <!--Осветитель-->
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Осветитель:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Осветитель:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
                                 <ToggleButton x:Name="BOSVToggle"
                                   ToolTip="включить осветитель"
                                   Grid.Row="0" Grid.Column="1"
@@ -178,14 +182,13 @@
                                   IsChecked="False" />
 
                                 <!--Яркость света-->
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Яркость света:" Foreground="White" VerticalAlignment="Center" FontSize="24"
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Яркость света:" Foreground="White" VerticalAlignment="Center" FontSize="14"
                                    Visibility="{Binding IsChecked, ElementName=BOSVToggle, Converter={StaticResource BoolToVis}}"/>
 
                                 <Slider x:Name="BOSVSlider"
                                     Grid.Row="1" Grid.Column="1"
                                     Minimum="0" Maximum="10"
                                     Value="{Binding BOSVFactor, Mode=TwoWay}" 
-                                    Width="300" 
                                     VerticalAlignment="Center" 
                                     Style="{StaticResource DarkSliderStyle}"
                                     Visibility="{Binding IsChecked, ElementName=BOSVToggle, Converter={StaticResource BoolToVis}}"
@@ -193,33 +196,39 @@
                                     IsSnapToTickEnabled="True"
                                     IsMoveToPointEnabled="True"/>
 
-                                <TextBlock Grid.Row="1" Grid.Column="2" Foreground="White" FontSize="20" VerticalAlignment="Center"
+                                <TextBlock Grid.Row="1" Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
                                    Text="{Binding Value, ElementName=BOSVSlider, StringFormat={}{0:F0}}"
-                                   Visibility="{Binding IsChecked, ElementName=BOSVToggle, Converter={StaticResource BoolToVis}}"/>
+                                   Visibility="{Binding IsChecked, ElementName=BOSVToggle, Converter={StaticResource BoolToVis}}" HorizontalAlignment="Center"/>
 
                                 <!-- Управление помпой -->
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Помпа:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" 
+                                   Text="Помпа:" 
+                                   Foreground="White" 
+                                   VerticalAlignment="Center" 
+                                   FontSize="14"/>
 
-                                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <StackPanel Grid.Row="2" Grid.Column="1" 
+                                    Orientation="Vertical" 
+                                    VerticalAlignment="Center" 
+                                    HorizontalAlignment="Center"
+                                    Margin="0,0,0,0">
+
                                     <!-- Вкл/Выкл -->
                                     <ToggleButton x:Name="PumpToggle"
-                                      Width="100"
-                                      Height="35"
-                                      Content="Вкл / Выкл"
-                                      ToolTip="Включить или выключить помпу"
-                                      Style="{StaticResource DarkToggleButtonStyle}" Margin="0,0,20,0"/>
+                                        Content="Вкл / Выкл"
+                                        ToolTip="Включить или выключить помпу"
+                                        Style="{StaticResource DarkToggleButtonStyle}"
+                                        Margin="0,0,0,5" MinHeight="30"/>
 
                                     <!-- Режим мощности -->
                                     <ToggleButton x:Name="PumpPowerToggle"
-                                      Width="130"
-                                      Height="35"
-                                      Content="Норм / Макс"
-                                      ToolTip="Переключить мощность помпы"
-                                      Style="{StaticResource DarkToggleButtonStyle}"/>
+                                        Content="Норм / Макс"
+                                        ToolTip="Переключить мощность помпы"
+                                        Style="{StaticResource DarkToggleButtonStyle}" Padding="5,10,5,10" MinHeight="30" MinWidth="90"/>
                                 </StackPanel>
 
                                 <!-- Состояние помпы (отладка или индикация) -->
-                                <TextBlock x:Name="PumpStatusTextBlock" Grid.Row="2" Grid.Column="2" Foreground="LightGray" FontSize="16"
+                                <TextBlock x:Name="PumpStatusTextBlock" Grid.Row="2" Grid.Column="2" Foreground="LightGray" FontSize="14"
                                    VerticalAlignment="Center"
                                    Text="Выкл (Норм)"/>
 
@@ -229,21 +238,21 @@
 
                         <!-- Установки экрана -->
                         <TabItem Header="Установки экрана">
-                            <Grid Margin="20,0,20,0">
+                            <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="70"/>
                                     <RowDefinition Height="70"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="180"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Данные пациента:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Данные пациента:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
                                 <ToggleButton x:Name="PatientDataToggle" Grid.Row="0" Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" VerticalAlignment="Center" IsChecked="True"/>
 
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Часы:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Часы:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
                                 <ToggleButton x:Name="ClockToggle" Grid.Row="1" Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" VerticalAlignment="Center" IsChecked="True"/>
                             </Grid>
                         </TabItem>
@@ -251,65 +260,65 @@
 
                         <!-- Установки кнопок -->
                         <TabItem Header="Установки кнопок">
-                            <Grid Margin="20,0,20,0">
+                            <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="70"/>
-                                    <RowDefinition Height="70"/>
-                                    <RowDefinition Height="70"/>
-                                    <RowDefinition Height="70"/>
-                                    <RowDefinition Height="70"/>
-                                    <RowDefinition Height="70"/>
-                                    <RowDefinition Height="70"/>
+                                    <RowDefinition Height="50"/>
+                                    <RowDefinition Height="50"/>
+                                    <RowDefinition Height="50"/>
+                                    <RowDefinition Height="50"/>
+                                    <RowDefinition Height="50"/>
+                                    <RowDefinition Height="50"/>
+                                    <RowDefinition Height="50"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="120"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="КНОПКА 1:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="КНОПКА 1:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
                                 <ComboBox Grid.Row="0" Grid.Column="1" Style="{StaticResource DarkComboBoxStyle}" SelectedIndex="0">
                                     <ComboBoxItem Content="Функция A"/>
                                     <ComboBoxItem Content="Функция B"/>
                                     <ComboBoxItem Content="Функция C"/>
                                 </ComboBox>
 
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="КНОПКА 2:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="КНОПКА 2:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
                                 <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource DarkComboBoxStyle}" SelectedIndex="0">
                                     <ComboBoxItem Content="Функция A"/>
                                     <ComboBoxItem Content="Функция B"/>
                                     <ComboBoxItem Content="Функция C"/>
                                 </ComboBox>
 
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="КНОПКА 3:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="КНОПКА 3:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
                                 <ComboBox Grid.Row="2" Grid.Column="1" Style="{StaticResource DarkComboBoxStyle}" SelectedIndex="0">
                                     <ComboBoxItem Content="Функция A"/>
                                     <ComboBoxItem Content="Функция B"/>
                                     <ComboBoxItem Content="Функция C"/>
                                 </ComboBox>
 
-                                <TextBlock Grid.Row="3" Grid.Column="0" Text="КНОПКА 4:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="КНОПКА 4:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
                                 <ComboBox Grid.Row="3" Grid.Column="1" Style="{StaticResource DarkComboBoxStyle}" SelectedIndex="0">
                                     <ComboBoxItem Content="Функция A"/>
                                     <ComboBoxItem Content="Функция B"/>
                                     <ComboBoxItem Content="Функция C"/>
                                 </ComboBox>
 
-                                <TextBlock Grid.Row="4" Grid.Column="0" Text="КНОПКА 5:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="КНОПКА 5:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
                                 <ComboBox Grid.Row="4" Grid.Column="1" Style="{StaticResource DarkComboBoxStyle}" SelectedIndex="0">
                                     <ComboBoxItem Content="Функция A"/>
                                     <ComboBoxItem Content="Функция B"/>
                                     <ComboBoxItem Content="Функция C"/>
                                 </ComboBox>
 
-                                <TextBlock Grid.Row="5" Grid.Column="0" Text="ЛЕВАЯ ПЕДАЛЬ:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="5" Grid.Column="0" Text="ЛЕВАЯ ПЕДАЛЬ:" Foreground="White" VerticalAlignment="Center" FontSize="14" HorizontalAlignment="Left"/>
                                 <ComboBox Grid.Row="5" Grid.Column="1" Style="{StaticResource DarkComboBoxStyle}" SelectedIndex="0">
                                     <ComboBoxItem Content="Функция A"/>
                                     <ComboBoxItem Content="Функция B"/>
                                     <ComboBoxItem Content="Функция C"/>
                                 </ComboBox>
 
-                                <TextBlock Grid.Row="6" Grid.Column="0" Text="ПРАВАЯ ПЕДАЛЬ:" Foreground="White" VerticalAlignment="Center" FontSize="24"/>
+                                <TextBlock Grid.Row="6" Grid.Column="0" Text="ПРАВАЯ ПЕДАЛЬ:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
                                 <ComboBox Grid.Row="6" Grid.Column="1" Style="{StaticResource DarkComboBoxStyle}" SelectedIndex="0">
                                     <ComboBoxItem Content="Функция A"/>
                                     <ComboBoxItem Content="Функция B"/>
@@ -321,7 +330,7 @@
 
                         <!-- Работа с данными -->
                         <TabItem Header="Работа с данными">
-                            <Grid Margin="20">
+                            <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="50"/>
                                     <RowDefinition Height="*"/>
@@ -331,8 +340,8 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Изображения" Foreground="White" VerticalAlignment="Center" FontSize="24" HorizontalAlignment="Center"/>
-                                <TextBlock Grid.Row="0" Grid.Column="1" Text="Видеоизображения" Foreground="White" VerticalAlignment="Center" FontSize="24" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Изображения" Foreground="White" VerticalAlignment="Center" FontSize="14" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="Видеоизображения" Foreground="White" VerticalAlignment="Center" FontSize="14" HorizontalAlignment="Center"/>
 
                                 <!--Список изображений-->
                                 <ScrollViewer Grid.Row="1" Grid.Column="0" VerticalScrollBarVisibility="Auto">
@@ -341,7 +350,7 @@
                                             <DataTemplate>
                                                 <Border BorderThickness="1" BorderBrush="Gray" Margin="5">
                                                     <Image Source="{Binding Thumbnail}" 
-                                   Width="150" Height="100" 
+                                   Width="120" Height="80" 
                                    Stretch="UniformToFill"
                                    MouseLeftButtonDown="Image_DoubleClick"/>
                                                 </Border>
@@ -358,7 +367,7 @@
                                                 <Border BorderThickness="1" BorderBrush="Gray" Margin="5">
                                                     <StackPanel MouseLeftButtonDown="Video_DoubleClick">
                                                         <Image Source="{Binding Thumbnail}" 
-                                                           Width="150" Height="100"
+                                                           Width="120" Height="80"
                                                            Stretch="UniformToFill"/>
                                                         <TextBlock Text="{Binding FileName}"
                                                            Foreground="White"
@@ -377,7 +386,7 @@
 
                         <!-- Копирование данных -->
                         <TabItem x:Name="DataCopyTabItem" Header="Копирование данных" Loaded="DataCopyTabItem_Loaded">
-                            <Grid Margin="20">
+                            <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
@@ -388,7 +397,7 @@
                                 <!-- Заголовок -->
                                 <TextBlock Grid.Row="0"
                                    Text="Копирование данных на флешку"
-                                   FontSize="18"
+                                   FontSize="14"
                                    FontWeight="Bold"
                                    Margin="0,0,0,10"/>
 
@@ -397,23 +406,23 @@
                                    Grid.Row="1"
                                    Text="Проверка наличия флешки..."
                                    FontSize="14"
-                                   Foreground="Gray"
+                                   Foreground="White"
                                    Margin="0,5,0,15"/>
 
                                 <!-- Кнопки управления -->
                                 <StackPanel Grid.Row="2"
-                                    Orientation="Horizontal"
+                                    Orientation="Vertical"
                                     Margin="0,0,0,10">
 
                                     <Button Content="Проверить флешку"
                                     Click="CheckUsb_Click"
-                                    Margin="0,0,10,0"
-                                    Background="#FFAAAAAA" FontSize="18" Padding="10,5,10,5"/>
+                                    Margin="0,0,0,10"
+                                    Background="#FFAAAAAA" FontSize="14" Padding="10,5,10,5" HorizontalAlignment="Center"/>
 
                                     <Button x:Name="DataCopyBtn" Content="Копировать данные"
                                         Click="CopyData_Click"
                                         Background="#FF4CAF50"
-                                        Foreground="White" FontSize="18" Padding="10,5,10,5"/>
+                                        Foreground="White" FontSize="14" Padding="10,5,10,5" HorizontalAlignment="Center"/>
 
                                 </StackPanel>
 
@@ -434,9 +443,9 @@
 
                         <!-- Сброс по умолчанию -->
                         <TabItem Header="Сброс по умолчанию">
-                            <Grid Margin="20">
+                            <Grid>
                                 <Button x:Name="ResetSettingsBtn" Content="Сбросить настройки по умолчанию" Background="Crimson" 
-                                Foreground="White" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Top" Padding="10,10,10,10" Click="ResetSettingsBtn_Click"/>
+                                Foreground="White" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Top" Padding="10,10,10,10" Click="ResetSettingsBtn_Click"/>
                             </Grid>
                         </TabItem>
                     </TabControl>

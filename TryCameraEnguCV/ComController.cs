@@ -115,7 +115,7 @@ public class ComController : IDisposable
                     Debug.WriteLine("❌ Ошибка при отправке: " + ex.Message);
                 }
 
-                await Task.Delay(200, _cts.Token); // 50 мс между командами
+                await Task.Delay(200, _cts.Token); // 200 мс между командами
             }
         }, _cts.Token);
     }

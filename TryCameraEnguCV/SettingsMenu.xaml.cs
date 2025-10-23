@@ -54,6 +54,13 @@ namespace TryCameraEnguCV
         public SettingsMenu(ComController comController)
         {
             InitializeComponent();
+
+            // Определяем положение окна — снизу слева
+            var screen = SystemParameters.WorkArea; // рабочая область (без панели задач)
+            this.Left = screen.Left + 10;            // немного отступаем от левого края
+            this.Top = screen.Bottom - this.Height - 10; // немного отступаем от нижнего края
+
+
             _comController = comController;
 
             // --- Подписка на COM-ответы ---

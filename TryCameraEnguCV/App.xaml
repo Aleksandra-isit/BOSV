@@ -51,8 +51,8 @@
             <Setter Property="Background" Value="#2B2B3C"/>
             <Setter Property="BorderBrush" Value="#FFFFB3"/>
             <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="FontSize" Value="20"/>
-            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="3"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Template">
@@ -149,7 +149,7 @@
                                 <Track.DecreaseRepeatButton>
                                     <RepeatButton Command="Slider.DecreaseLarge" 
                                           Background="#FFFFB3" 
-                                          Height="6" 
+                                          Height="4" 
                                           BorderThickness="0" 
                                           Focusable="False"/>
                                 </Track.DecreaseRepeatButton>
@@ -158,14 +158,14 @@
                                 <Track.IncreaseRepeatButton>
                                     <RepeatButton Command="Slider.IncreaseLarge" 
                                           Background="#444" 
-                                          Height="6" 
+                                          Height="4" 
                                           BorderThickness="0" 
                                           Focusable="False"/>
                                 </Track.IncreaseRepeatButton>
 
                                 <!-- Ползунок -->
                                 <Track.Thumb>
-                                    <Thumb x:Name="Thumb" Width="20" Height="20">
+                                    <Thumb x:Name="Thumb" Width="15" Height="15">
                                         <Thumb.Template>
                                             <ControlTemplate TargetType="Thumb">
                                                 <Border Background="#2B2B3C"
@@ -202,8 +202,8 @@
             <Setter Property="Background" Value="#2B2B3C"/>
             <Setter Property="BorderBrush" Value="#FFFFB3"/>
             <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="5,4"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>

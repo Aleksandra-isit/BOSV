@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
@@ -304,6 +305,7 @@ namespace TryCameraEnguCV
 
                 miniCameraImage.Source = BitmapSourceConvert.ToBitmapSource(adjusted.Mat);
             }
+
 
             // --- Запись видео ---
             //if (_isRecording && _videoWriter != null)
@@ -802,4 +804,6 @@ namespace TryCameraEnguCV
                 BitmapSizeOptions.FromEmptyOptions());
         }
     }
+
+
 }
