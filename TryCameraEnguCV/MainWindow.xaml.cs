@@ -75,6 +75,10 @@ namespace TryCameraEnguCV
         public ICommand VideoRecordingCommand { get; }
         public ICommand ToggleScaleCommand { get; }
 
+        // ТЕКУЩИЙ КАДР в UI ФОРМАТЕ
+        private WriteableBitmap _cameraBitmap;
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -169,10 +173,14 @@ namespace TryCameraEnguCV
                 // Загружаем пользовательские настройки
                 LoadUserSettings();
 
-                // --- Подписка на CompositionTarget.Rendering для плавного видео ---
+                // Создаём WriteableBitmap один раз
+                _cameraBitmap = BitmapSourceConvertFast.CreateWriteableBitmap(1920, 1080);
+                cameraImage.Source = _cameraBitmap;
+
+                // Подписка на CompositionTarget.Rendering для плавного видео
                 CompositionTarget.Rendering += (s, e) =>
                 {
-                    UpdateCameraFrame();
+                    UpdateCameraFrameFast();
                 };
             }
             else
@@ -190,9 +198,9 @@ namespace TryCameraEnguCV
         }
 
         private bool _hasFrameErrorShown = false;
-        private bool _hasRenderErrorShown = false;
 
-        private void UpdateCameraFrame()
+        // Отрисовка и обработка кадров
+        private void UpdateCameraFrameFast()
         {
             try
             {
@@ -210,29 +218,31 @@ namespace TryCameraEnguCV
                     // --- Обновление UI ---
                     if (!isFreezeFrame)
                     {
-                        cameraImage.Source = BitmapSourceConvert.ToBitmapSource(adjusted.Mat);
+                        BitmapSourceConvertFast.UpdateBitmapFromMat(adjusted.Mat, _cameraBitmap);
                     }
                     else
                     {
                         if (frozenFrame != null)
-                            cameraImage.Source = BitmapSourceConvert.ToBitmapSource(frozenFrame);
+                            BitmapSourceConvertFast.UpdateBitmapFromMat(frozenFrame, _cameraBitmap);
 
-                        miniCameraImage.Source = BitmapSourceConvert.ToBitmapSource(adjusted.Mat);
+                        BitmapSourceConvertFast.UpdateBitmapFromMat(adjusted.Mat, miniCameraImage.Source as WriteableBitmap);
                     }
 
                     // Успешный кадр — сбрасываем флаги ошибок
                     _hasFrameErrorShown = false;
-                    _hasRenderErrorShown = false;
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(
-                        $"Ошибка при обновлении кадра:\n{ex.Message}",
-                        "Ошибка отображения кадра",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning
-                    );
-                    return; // пропускаем кадр
+                    if (!_hasFrameErrorShown)
+                    {
+                        MessageBox.Show(
+                            $"Ошибка при обновлении кадра:\n{ex.Message}",
+                            "Ошибка отображения кадра",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning
+                        );
+                        _hasFrameErrorShown = true;
+                    }
                 }
 
                 // --- Запись видео (если нужна) ---
@@ -357,60 +367,60 @@ namespace TryCameraEnguCV
             userSelect.Show();
         }
 
-        private void ProcessFrame(object? sender, EventArgs e)
-        {
-            try
-            {
-                using var frame = _capture.QueryFrame();
-                if (frame == null || frame.IsEmpty)
-                    return;
+        //private void ProcessFrame(object? sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        using var frame = _capture.QueryFrame();
+        //        if (frame == null || frame.IsEmpty)
+        //            return;
 
-                using var image = frame.ToImage<Bgr, byte>();
-                using var adjusted = ApplyAllAdjustments(image, _cameraSettings.Saturation, blueFactor, redFactor);
+        //        using var image = frame.ToImage<Bgr, byte>();
+        //        using var adjusted = ApplyAllAdjustments(image, _cameraSettings.Saturation, blueFactor, redFactor);
 
-                // --- Отображение на UI ---
-                try
-                {
-                    if (!isFreezeFrame)
-                    {
-                        cameraImage.Source = BitmapSourceConvert.ToBitmapSource(adjusted.Mat);
-                    }
-                    else
-                    {
-                        if (frozenFrame != null)
-                            cameraImage.Source = BitmapSourceConvert.ToBitmapSource(frozenFrame);
+        //        // --- Отображение на UI ---
+        //        try
+        //        {
+        //            if (!isFreezeFrame)
+        //            {
+        //                cameraImage.Source = BitmapSourceConvert.ToBitmapSource(adjusted.Mat);
+        //            }
+        //            else
+        //            {
+        //                if (frozenFrame != null)
+        //                    cameraImage.Source = BitmapSourceConvert.ToBitmapSource(frozenFrame);
 
-                        miniCameraImage.Source = BitmapSourceConvert.ToBitmapSource(adjusted.Mat);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(
-                        $"Ошибка при обновлении кадра:\n{ex.Message}",
-                        "Ошибка отображения кадра",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning
-                    );
-                    return; // пропускаем кадр
-                }
+        //                miniCameraImage.Source = BitmapSourceConvert.ToBitmapSource(adjusted.Mat);
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            MessageBox.Show(
+        //                $"Ошибка при обновлении кадра:\n{ex.Message}",
+        //                "Ошибка отображения кадра",
+        //                MessageBoxButton.OK,
+        //                MessageBoxImage.Warning
+        //            );
+        //            return; // пропускаем кадр
+        //        }
 
-                // --- Запись видео ---
-                // if (_isRecording && _videoWriter != null)
-                // {
-                //     CaptureCanvasForVideo(videoContainer);
-                // }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    $"Ошибка при обработке кадра:\n{ex.Message}",
-                    "Ошибка обработки",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error
-                );
-                // Пропускаем кадр — не останавливаем поток
-            }
-        }
+        //        // --- Запись видео ---
+        //        // if (_isRecording && _videoWriter != null)
+        //        // {
+        //        //     CaptureCanvasForVideo(videoContainer);
+        //        // }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(
+        //            $"Ошибка при обработке кадра:\n{ex.Message}",
+        //            "Ошибка обработки",
+        //            MessageBoxButton.OK,
+        //            MessageBoxImage.Error
+        //        );
+        //        // Пропускаем кадр — не останавливаем поток
+        //    }
+        //}
 
         private async void VideoRecording()
         {
@@ -886,30 +896,52 @@ namespace TryCameraEnguCV
         }
     }
 
-    public static class BitmapSourceConvert
+    public static class BitmapSourceConvertFast
     {
-        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
-        private static extern bool DeleteObject(IntPtr hObject);
-
-        public static BitmapSource ToBitmapSource(Mat mat)
+        /// <summary>
+        /// Создаёт WriteableBitmap нужного размера и формата. Используется один раз при инициализации.
+        /// </summary>
+        public static WriteableBitmap CreateWriteableBitmap(int width, int height)
         {
-            using Bitmap bitmap = mat.ToBitmap();
-            IntPtr hBitmap = bitmap.GetHbitmap();
+            return new WriteableBitmap(
+                width,
+                height,
+                96, 96,               // DPI
+                PixelFormats.Bgr24,    // соответствует формату EmguCV Bgr
+                null);
+        }
 
-            try
+        /// <summary>
+        /// Обновляет WriteableBitmap данными из EmguCV Mat.
+        /// </summary>
+        public static void UpdateBitmapFromMat(Mat mat, WriteableBitmap targetBitmap)
+        {
+            if (mat == null || mat.IsEmpty || targetBitmap == null)
+                return;
+
+            int width = mat.Cols;
+            int height = mat.Rows;
+            int matStride = (int)mat.Step;  // количество байт в строке Mat
+            int bmpStride = targetBitmap.BackBufferStride;
+
+            targetBitmap.Lock();
+            unsafe
             {
-                return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-                    hBitmap,
-                    IntPtr.Zero,
-                    Int32Rect.Empty,
-                    BitmapSizeOptions.FromEmptyOptions());
+                byte* pBackBuffer = (byte*)targetBitmap.BackBuffer;
+                byte* pMatData = (byte*)mat.DataPointer;
+
+                for (int y = 0; y < height; y++)
+                {
+                    byte* src = pMatData + y * matStride;
+                    byte* dst = pBackBuffer + y * bmpStride;
+
+                    // копируем всю строку
+                    Buffer.MemoryCopy(src, dst, bmpStride, width * 3);
+                }
             }
-            finally
-            {
-                DeleteObject(hBitmap); // важно для предотвращения утечек GDI
-            }
+
+            targetBitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
+            targetBitmap.Unlock();
         }
     }
-
 }
