@@ -164,6 +164,8 @@ namespace TryCameraEnguCV
 
             // Пробуем открыть камеру сразу
             _capture = new VideoCapture(0);
+            TimeStackPanel.Visibility = Visibility.Visible;
+
 
             if (_capture != null && _capture.IsOpened)
             {
@@ -187,14 +189,6 @@ namespace TryCameraEnguCV
             {
                 MessageBox.Show("Камера не обнаружена!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-            //// Настраиваем таймер под этот FPS
-            //_timer = new DispatcherTimer
-            //{
-            //    Interval = TimeSpan.FromMilliseconds(15)
-            //};
-            //_timer.Tick += ProcessFrame;
-            //_timer.Start();
         }
 
         private bool _hasFrameErrorShown = false;
@@ -268,15 +262,95 @@ namespace TryCameraEnguCV
         }
 
 
+        private CancellationTokenSource _clockCancellation;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            _clockTimer.Interval = TimeSpan.FromSeconds(1);
-            _clockTimer.Tick += UpdateClock;
-            _clockTimer.Start();
+            TimeStackPanel.Visibility = Visibility.Visible;
+
+            //_clockTimer = new DispatcherTimer();
+            //_clockTimer.Interval = TimeSpan.FromSeconds(1);
+            //_clockTimer.Tick += UpdateClock;
+            //_clockTimer.Start();
+
+            //// Первый вызов сразу при загрузке
+            //UpdateClock(null, null);
+
+            _clockCancellation = new CancellationTokenSource();
+            StartClockUpdater(_clockCancellation.Token);
 
             // Фокус на окне, чтобы сразу ловить клавиши
             this.Focus();
             Keyboard.Focus(this);
+        }
+
+        private void StartClockUpdater(CancellationToken token)
+        {
+            Task.Run(async () =>
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    // Обновляем UI через Dispatcher
+                    await Dispatcher.InvokeAsync(() =>
+                    {
+                        dateText.Text = DateTime.Now.ToString("dd.MM.yyyy");
+                        timeText.Text = DateTime.Now.ToString("HH:mm:ss");
+                    });
+
+                    await Task.Delay(1000, token); // раз в секунду
+                }
+            }, token);
+        }
+
+        private CancellationTokenSource _stopwatchCancellation;
+        private bool _isStopwatchRunning = false;
+
+        private void ToggleStopwatch()
+        {
+            _stopwatchIndex = (_stopwatchIndex + 1) % _stopwatchState.Length;
+
+            switch (_stopwatchIndex)
+            {
+                case 0: // сброс
+                    _isStopwatchRunning = false;
+                    _stopwatchCancellation?.Cancel();
+                    _elapsedTime = TimeSpan.Zero;
+                    stopwatchText.Visibility = Visibility.Collapsed;
+                    stopwatchText.Text = "";
+                    break;
+
+                case 1: // старт
+                    _lastStartTime = DateTime.Now;
+                    stopwatchText.Visibility = Visibility.Visible;
+                    _isStopwatchRunning = true;
+                    _stopwatchCancellation = new CancellationTokenSource();
+                    StartStopwatchUpdater(_stopwatchCancellation.Token);
+                    break;
+
+                case 2: // пауза
+                    _isStopwatchRunning = false;
+                    _stopwatchCancellation?.Cancel();
+                    _elapsedTime += DateTime.Now - _lastStartTime;
+                    break;
+            }
+        }
+
+        private async void StartStopwatchUpdater(CancellationToken token)
+        {
+            try
+            {
+                while (!token.IsCancellationRequested && _isStopwatchRunning)
+                {
+                    var currentElapsed = _elapsedTime + (DateTime.Now - _lastStartTime);
+
+                    await Dispatcher.InvokeAsync(() =>
+                    {
+                        stopwatchText.Text = currentElapsed.ToString(@"hh\:mm\:ss");
+                    });
+
+                    await Task.Delay(1000, token);
+                }
+            }
+            catch (TaskCanceledException) { }
         }
 
         // ЗАГРУЖАЕМ НАСТРОЙКИ ПО КАЖДОМУ ИЗ ПОЛЬЗОВАТЕЛЕЙ
@@ -345,6 +419,13 @@ namespace TryCameraEnguCV
             File.WriteAllText(userFile, json);
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+
+            // Корректно останавливаем фоновый поток при закрытии окна
+            _clockCancellation?.Cancel();
+        }
 
         // СОХРАНЕНИЕ НАСТРОЕК ПРИ ЗАКРЫТИИ ПРОГРАММЫ
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -543,30 +624,30 @@ namespace TryCameraEnguCV
         }
 
         // Секундомер
-        private void ToggleStopwatch()
-        {
-            _stopwatchIndex = (_stopwatchIndex + 1) % _stopwatchState.Length;
+        //private void ToggleStopwatch()
+        //{
+        //    _stopwatchIndex = (_stopwatchIndex + 1) % _stopwatchState.Length;
 
-            switch (_stopwatchIndex)
-            {
-                case 0: // выкл
-                    _stopwatchTimer.Stop();
-                    _elapsedTime = TimeSpan.Zero;
-                    stopwatchText.Text = "";
-                    stopwatchText.Visibility = Visibility.Collapsed;
-                    break;
-                case 1: // старт
-                    _lastStartTime = DateTime.Now;
-                    stopwatchText.Visibility = Visibility.Visible;
-                    _stopwatchTimer.Start();
-                    break;
+        //    switch (_stopwatchIndex)
+        //    {
+        //        case 0: // выкл
+        //            _stopwatchTimer.Stop();
+        //            _elapsedTime = TimeSpan.Zero;
+        //            stopwatchText.Text = "";
+        //            stopwatchText.Visibility = Visibility.Collapsed;
+        //            break;
+        //        case 1: // старт
+        //            _lastStartTime = DateTime.Now;
+        //            stopwatchText.Visibility = Visibility.Visible;
+        //            _stopwatchTimer.Start();
+        //            break;
 
-                case 2: // пауза
-                    _stopwatchTimer.Stop();
-                    _elapsedTime += DateTime.Now - _lastStartTime;
-                    break;
-            }
-        }
+        //        case 2: // пауза
+        //            _stopwatchTimer.Stop();
+        //            _elapsedTime += DateTime.Now - _lastStartTime;
+        //            break;
+        //    }
+        //}
 
         private void UpdateTransform()
         {
@@ -747,10 +828,13 @@ namespace TryCameraEnguCV
         }
 
 
-        private void UpdateClock(object? sender, EventArgs e)
+        private void UpdateClock(object sender, EventArgs e)
         {
-            dateText.Text = DateTime.Now.ToString("dd.MM.yyyy");
-            timeText.Text = DateTime.Now.ToString("HH:mm:ss");
+            Dispatcher.Invoke(() =>
+            {
+                dateText.Text = DateTime.Now.ToString("dd.MM.yyyy");
+                timeText.Text = DateTime.Now.ToString("HH:mm:ss");
+            });
         }
 
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)

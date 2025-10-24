@@ -62,7 +62,9 @@
             <StackPanel x:Name="TimeStackPanel" Orientation="Vertical"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
-                        Margin="10">
+                        Margin="10"
+                        Panel.ZIndex="10"
+                        >
                 <TextBlock Name="dateText"
                            FontSize="24"
                            Foreground="White"
