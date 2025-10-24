@@ -419,32 +419,29 @@ namespace TryCameraEnguCV
             File.WriteAllText(userFile, json);
         }
 
-        protected override void OnClosed(EventArgs e)
-        {
-            base.OnClosed(e);
-
-            // Корректно останавливаем фоновый поток при закрытии окна
-            _clockCancellation?.Cancel();
-        }
-
-        // СОХРАНЕНИЕ НАСТРОЕК ПРИ ЗАКРЫТИИ ПРОГРАММЫ
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             base.OnClosing(e);
 
+            // Завершаем COM и фоновые процессы
             _comController?.Stop();
             _comController?.Dispose();
+
+            _clockCancellation?.Cancel();
 
             // Сохраняем настройки
             SaveUserSettings();
 
-            // Создаём заново окно выбора пользователя
+            // Здесь не создаём новое окно! Только подготовка.
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+
+            // Создаём окно выбора пользователя после закрытия MainWindow
             var userSelect = new UserSelectionWindow();
-
-            // Устанавливаем его главным окном приложения
             Application.Current.MainWindow = userSelect;
-
-            // Показываем окно выбора пользователя
             userSelect.Show();
         }
 
