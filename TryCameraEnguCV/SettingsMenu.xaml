@@ -109,7 +109,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Яркость:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
-                                <Slider x:Name="BrightnessSlider" Grid.Row="0" Grid.Column="1" Minimum="-100" Maximum="100" 
+                                <Slider x:Name="BrightnessSlider" Grid.Row="0" Grid.Column="1" Minimum="-50" Maximum="50" 
                                         Value="{Binding Brightness, Mode=TwoWay}" 
                                         VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"
                                         TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
