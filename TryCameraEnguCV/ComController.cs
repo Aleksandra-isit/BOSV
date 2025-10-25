@@ -249,21 +249,76 @@ public class ComController : IDisposable
         }
     }
 
-    public void Stop()
+    public async Task StopAsync()
     {
         try
         {
+            // Сигнал всем задачам завершиться
             _cts?.Cancel();
-            _sendTask?.Wait();
-            _serialPort?.Close();
-            Debug.WriteLine("⚙️ COM-порт закрыт.");
+
+            // Даем немного времени на завершение фоновых задач
+            if (_sendTask != null)
+            {
+                try
+                {
+                    using var timeoutCts = new CancellationTokenSource(1000);
+                    await Task.WhenAny(_sendTask, Task.Delay(1000, timeoutCts.Token));
+                }
+                catch (TaskCanceledException)
+                {
+                    Debug.WriteLine("📭 Задача отправки отменена корректно.");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"⚠️ Ошибка при ожидании завершения задачи: {ex}");
+                }
+            }
+
+            // Безопасно закрываем порт
+            if (_serialPort != null)
+            {
+                try
+                {
+                    _serialPort.DataReceived -= SerialPort_DataReceived;
+
+                    if (_serialPort.IsOpen)
+                    {
+                        Debug.WriteLine("🔌 Завершаем работу с COM...");
+                        _serialPort.DiscardInBuffer();
+                        _serialPort.DiscardOutBuffer();
+
+                        await Task.Run(() =>
+                        {
+                            try { _serialPort.Close(); }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine($"⚠️ Ошибка при закрытии порта: {ex.Message}");
+                            }
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"⚠️ Ошибка при завершении работы порта: {ex.Message}");
+                }
+                finally
+                {
+                    _serialPort.Dispose();
+                    _serialPort = null;
+                }
+            }
+
+            Debug.WriteLine("⚙️ COM-порт закрыт безопасно.");
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"❌ Ошибка при остановке COM: {ex.Message}");
+        }
     }
 
-    public void Dispose()
+    public async void Dispose()
     {
-        Stop();
+        await StopAsync();
         _serialPort?.Dispose();
         _cts?.Dispose();
     }

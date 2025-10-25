@@ -93,6 +93,7 @@ namespace TryCameraEnguCV
         public MainWindow(User user)
         {
             InitializeComponent();
+            Application.Current.MainWindow = this;
 
             _comController = new ComController("COM3", 9600);
             _comController.DataReceived += msg =>
@@ -182,7 +183,7 @@ namespace TryCameraEnguCV
                 // Подписка на CompositionTarget.Rendering для плавного видео
                 CompositionTarget.Rendering += (s, e) =>
                 {
-                    UpdateCameraFrameFast();
+                    UpdateCameraFrameFast(s, e);
                 };
             }
             else
@@ -192,10 +193,15 @@ namespace TryCameraEnguCV
         }
 
         private bool _hasFrameErrorShown = false;
+        private bool _isCameraActive = true;
+
 
         // Отрисовка и обработка кадров
-        private void UpdateCameraFrameFast()
+        private void UpdateCameraFrameFast(object? sender, EventArgs e)
         {
+            if (!_isCameraActive || _capture == null)
+                return;
+
             try
             {
                 using var frame = _capture.QueryFrame();
@@ -266,15 +272,6 @@ namespace TryCameraEnguCV
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             TimeStackPanel.Visibility = Visibility.Visible;
-
-            //_clockTimer = new DispatcherTimer();
-            //_clockTimer.Interval = TimeSpan.FromSeconds(1);
-            //_clockTimer.Tick += UpdateClock;
-            //_clockTimer.Start();
-
-            //// Первый вызов сразу при загрузке
-            //UpdateClock(null, null);
-
             _clockCancellation = new CancellationTokenSource();
             StartClockUpdater(_clockCancellation.Token);
 
@@ -422,83 +419,50 @@ namespace TryCameraEnguCV
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             base.OnClosing(e);
-
-            // Завершаем COM и фоновые процессы
-            _comController?.Stop();
-            _comController?.Dispose();
-
-            _clockCancellation?.Cancel();
-
-            // Сохраняем настройки
-            SaveUserSettings();
-
-            // Здесь не создаём новое окно! Только подготовка.
+            ExitApplication(); // Всё завершаем централизованно
         }
 
-        protected override void OnClosed(EventArgs e)
+        /// <summary>
+        /// Полное завершение приложения с сохранением и остановкой всех процессов.
+        /// </summary>
+        private async void ExitApplication()
         {
-            base.OnClosed(e);
+            try
+            {
+                // ⏹ Отключаем все визуальные обновления
+                CompositionTarget.Rendering -= UpdateCameraFrameFast;
 
-            // Создаём окно выбора пользователя после закрытия MainWindow
-            var userSelect = new UserSelectionWindow();
-            Application.Current.MainWindow = userSelect;
-            userSelect.Show();
+                // ⏱ Останавливаем таймеры
+                _timer?.Stop();
+                _stopwatchTimer?.Stop();
+
+                // 🎥 Освобождаем ресурсы камеры
+                _isCameraActive = false;
+                _capture?.Dispose();
+
+                // 🔌 Завершаем COM
+                if (_comController != null)
+                    await _comController.StopAsync();
+
+                // ⏸ Отменяем фоновые токены
+                _clockCancellation?.Cancel();
+
+                // 💾 Сохраняем пользовательские настройки
+                SaveUserSettings();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при завершении приложения:\n{ex.Message}",
+                    "Завершение", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            finally
+            {
+                // 🧹 Завершаем приложение полностью
+                Application.Current.Shutdown();
+            }
         }
 
-        //private void ProcessFrame(object? sender, EventArgs e)
-        //{
-        //    try
-        //    {
-        //        using var frame = _capture.QueryFrame();
-        //        if (frame == null || frame.IsEmpty)
-        //            return;
 
-        //        using var image = frame.ToImage<Bgr, byte>();
-        //        using var adjusted = ApplyAllAdjustments(image, _cameraSettings.Saturation, blueFactor, redFactor);
-
-        //        // --- Отображение на UI ---
-        //        try
-        //        {
-        //            if (!isFreezeFrame)
-        //            {
-        //                cameraImage.Source = BitmapSourceConvert.ToBitmapSource(adjusted.Mat);
-        //            }
-        //            else
-        //            {
-        //                if (frozenFrame != null)
-        //                    cameraImage.Source = BitmapSourceConvert.ToBitmapSource(frozenFrame);
-
-        //                miniCameraImage.Source = BitmapSourceConvert.ToBitmapSource(adjusted.Mat);
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            MessageBox.Show(
-        //                $"Ошибка при обновлении кадра:\n{ex.Message}",
-        //                "Ошибка отображения кадра",
-        //                MessageBoxButton.OK,
-        //                MessageBoxImage.Warning
-        //            );
-        //            return; // пропускаем кадр
-        //        }
-
-        //        // --- Запись видео ---
-        //        // if (_isRecording && _videoWriter != null)
-        //        // {
-        //        //     CaptureCanvasForVideo(videoContainer);
-        //        // }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(
-        //            $"Ошибка при обработке кадра:\n{ex.Message}",
-        //            "Ошибка обработки",
-        //            MessageBoxButton.OK,
-        //            MessageBoxImage.Error
-        //        );
-        //        // Пропускаем кадр — не останавливаем поток
-        //    }
-        //}
 
         private async void VideoRecording()
         {

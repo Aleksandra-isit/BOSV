@@ -99,6 +99,7 @@
                                     <RowDefinition Height="50"/>
                                     <RowDefinition Height="50"/>
                                     <RowDefinition Height="50"/>
+                                    <RowDefinition Height="50"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
@@ -108,7 +109,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Яркость:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
-                                <Slider x:Name="BrightnessSlider" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="100" 
+                                <Slider x:Name="BrightnessSlider" Grid.Row="0" Grid.Column="1" Minimum="-100" Maximum="100" 
                                         Value="{Binding Brightness, Mode=TwoWay}" 
                                         VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"
                                         TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
@@ -179,7 +180,7 @@
                                   Grid.Row="0" Grid.Column="1"
                                   Style="{StaticResource ToggleSwitchStyle}"
                                   VerticalAlignment="Center"
-                                  IsChecked="False" />
+                                  IsChecked="True" />
 
                                 <!--Яркость света-->
                                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Яркость света:" Foreground="White" VerticalAlignment="Center" FontSize="14"
