@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Emgu.CV.XPhoto;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -134,7 +135,8 @@ namespace TryCameraEnguCV
                     Saturation = 1.0,
                     Sharpness = _capture?.Get(Emgu.CV.CvEnum.CapProp.Sharpness) ?? 0.0,
                     RedFactor = 0.0,
-                    BlueFactor = 0.0
+                    BlueFactor = 0.0,
+                    WhiteBalance = 3421.0
                 };
 
                 string json = JsonSerializer.Serialize(defaultSettings, new JsonSerializerOptions { WriteIndented = true });
@@ -152,6 +154,7 @@ namespace TryCameraEnguCV
                 _cameraSettings.Sharpness = settings.GetValueOrDefault("Sharpness", 0.0);
                 _cameraSettings.RedFactor = settings.GetValueOrDefault("RedFactor", 0.0);
                 _cameraSettings.BlueFactor = settings.GetValueOrDefault("BlueFactor", 0.0);
+                _cameraSettings.WhiteBalance = settings.GetValueOrDefault("WhiteBalance", 3421.0);
             }
         }
 
@@ -172,7 +175,8 @@ namespace TryCameraEnguCV
                 Saturation = _cameraSettings.Saturation,
                 Sharpness = _cameraSettings.Sharpness,
                 RedFactor = _cameraSettings.RedFactor,
-                BlueFactor = _cameraSettings.BlueFactor
+                BlueFactor = _cameraSettings.BlueFactor,
+                WhiteBalance = _cameraSettings.WhiteBalance,
             };
 
             string json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });

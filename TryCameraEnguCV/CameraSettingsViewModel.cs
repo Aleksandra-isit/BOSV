@@ -11,6 +11,7 @@ namespace TryCameraEnguCV
     {
         private double _brightness;
         private double _saturation;
+        private double _whiteBalance;
         private double _sharpness;
         private double _redFactor = 1.0;
         private double _blueFactor = 1.0;
@@ -25,6 +26,12 @@ namespace TryCameraEnguCV
         {
             get => _saturation;
             set { _saturation = value; OnPropertyChanged(nameof(Saturation)); }
+        }
+
+        public double WhiteBalance
+        {
+            get => _whiteBalance;
+            set { _whiteBalance = value; OnPropertyChanged(nameof(WhiteBalance)); }
         }
 
         public double Sharpness

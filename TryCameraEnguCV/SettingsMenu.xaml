@@ -151,6 +151,14 @@
                                 <TextBlock Grid.Row="4" Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
                                Text="{Binding Value, ElementName=SaturationSlider, StringFormat={}{0:F1}}" HorizontalAlignment="Center"/>
 
+                                <TextBlock Grid.Row="5" Grid.Column="0" Text="Баланс белого:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
+                                <Slider x:Name="WhiteBalanceSlider" Grid.Row="5" Grid.Column="1" Minimum="2800" Maximum="6500" TickFrequency="1"
+                                        Value="{Binding WhiteBalance, Mode=TwoWay}" 
+                                        VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"
+                                        IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+                                <TextBlock Grid.Row="5" Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
+                               Text="{Binding Value, ElementName=WhiteBalanceSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center"/>
+
                             </Grid>
                         </TabItem>
 

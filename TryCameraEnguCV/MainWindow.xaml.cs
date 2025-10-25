@@ -150,6 +150,7 @@ namespace TryCameraEnguCV
                         _cameraSettings.BlueFactor = 0.0;
                         _cameraSettings.Sharpness = 0.0;
                         _cameraSettings.Saturation = 1.0;
+                        _cameraSettings.WhiteBalance = 3421.0;
                         SaveUserSettings();
                     };
 

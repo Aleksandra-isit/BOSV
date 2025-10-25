@@ -19,6 +19,8 @@ namespace TryCameraEnguCV
     {
         private int blueFactor = 1; // коэффициент усиления синего
         private int redFactor = 1;  // коэффициент усиления красного
+        private int whiteBalanceFactor = 2800; // коэффициент усиления ББ
+
 
         // Данные экрана
         private bool _screenDataVisibility = false;
@@ -63,7 +65,7 @@ namespace TryCameraEnguCV
                 }
 
                 using var image = frame.ToImage<Bgr, byte>();
-                using var adjusted = ApplyAllAdjustments(image, _cameraSettings.Saturation, blueFactor, redFactor);
+                using var adjusted = ApplyAllAdjustments(image, _cameraSettings.Saturation, blueFactor, redFactor, whiteBalanceFactor);
 
                 try
                 {
@@ -278,86 +280,115 @@ namespace TryCameraEnguCV
             _cameraSettings.Sharpness = _sharpnessLevels[_sharpnessIndex];
         }
 
-        private Image<Bgr, byte> ApplyAllAdjustments(Image<Bgr, byte> img, double saturationFactor, double blueFactorRaw, double redFactorRaw)
+        private unsafe Image<Bgr, byte> ApplyAllAdjustments(Image<Bgr, byte> img,
+            double saturationFactor, double blueFactorRaw, double redFactorRaw, double wbFactor)
         {
             Image<Bgr, byte> result = img.Clone();
+            int width = result.Width;
+            int height = result.Height;
+            int stride = width * 3;
 
-            // --- 1. софт-насыщенность ---
+            byte* ptr = (byte*)result.Mat.DataPointer;
+
+            // --- 0. Программный баланс белого (Gray World, выборка каждые 4 пикселя) ---
+            double sumR = 0, sumG = 0, sumB = 0;
+            int count = 0;
+            for (int y = 0; y < height; y += 4)
+            {
+                byte* row = ptr + y * stride;
+                for (int x = 0; x < width; x += 4)
+                {
+                    sumB += row[x * 3 + 0];
+                    sumG += row[x * 3 + 1];
+                    sumR += row[x * 3 + 2];
+                    count++;
+                }
+            }
+            double avgR = sumR / count;
+            double avgG = sumG / count;
+            double avgB = sumB / count;
+
+            double wbOffset = (wbFactor - 4650) / 1850;
+            double kR = avgG / avgR * (1.0 + 0.2 * wbOffset);
+            double kB = avgG / avgB * (1.0 - 0.2 * wbOffset);
+
+            double blueFactor = 1.0 + (blueFactorRaw / 20.0);
+            double redFactor = 1.0 + (redFactorRaw / 20.0);
+
+            // --- проход по всем пикселям один раз ---
+            for (int y = 0; y < height; y++)
+            {
+                byte* row = ptr + y * stride;
+                for (int x = 0; x < width; x++)
+                {
+                    int idx = x * 3;
+
+                    // WB + красно-синяя корректировка
+                    int b = (int)(row[idx + 0] * kB * blueFactor);
+                    int r = (int)(row[idx + 2] * kR * redFactor);
+
+                    row[idx + 0] = (byte)Math.Clamp(b, 0, 255);
+                    row[idx + 2] = (byte)Math.Clamp(r, 0, 255);
+                }
+            }
+
+            // --- 1. Насыщенность ---
             if (Math.Abs(saturationFactor - 1.0) > 0.001)
             {
                 using var hsv = result.Convert<Hsv, byte>();
-                var data = hsv.Data;
-
-                int height = hsv.Height;
-                int width = hsv.Width;
-
+                byte[,,] hsvData = hsv.Data;
                 for (int y = 0; y < height; y++)
-                {
                     for (int x = 0; x < width; x++)
                     {
-                        int s = (int)(data[y, x, 1] * saturationFactor);
-                        if (s < 0) s = 0;
-                        if (s > 255) s = 255;
-                        data[y, x, 1] = (byte)s;
+                        int s = (int)(hsvData[y, x, 1] * saturationFactor);
+                        hsvData[y, x, 1] = (byte)Math.Clamp(s, 0, 255);
                     }
-                }
 
                 using var saturated = hsv.Convert<Bgr, byte>();
                 result.Dispose();
                 result = saturated.Clone();
             }
 
-            // --- 2. красный/синий ---
-            {
-                var data = result.Data;
-                int height = result.Height;
-                int width = result.Width;
-
-                double blueFactor = 1.0 + (blueFactorRaw / 20.0);
-                double redFactor = 1.0 + (redFactorRaw / 20.0);
-
-                for (int y = 0; y < height; y++)
-                {
-                    for (int x = 0; x < width; x++)
-                    {
-                        int blue = (int)(data[y, x, 0] * blueFactor);
-                        int red = (int)(data[y, x, 2] * redFactor);
-
-                        if (blue < 0) blue = 0;
-                        if (blue > 255) blue = 255;
-                        if (red < 0) red = 0;
-                        if (red > 255) red = 255;
-
-                        data[y, x, 0] = (byte)blue;
-                        data[y, x, 2] = (byte)red;
-                    }
-                }
-            }
-
             return result;
         }
+
 
         // Изменение настроек на камеру прилетают
         private void CameraSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (_capture == null) return;
+            if (_capture == null || !_capture.IsOpened) return;
 
-            switch (e.PropertyName)
+            try
             {
-                case nameof(CameraSettingsViewModel.Brightness):
-                    _capture.Set(Emgu.CV.CvEnum.CapProp.Brightness, _cameraSettings.Brightness);
-                    break;
-                case nameof(CameraSettingsViewModel.Sharpness):
-                    _capture.Set(Emgu.CV.CvEnum.CapProp.Sharpness, _cameraSettings.Sharpness);
-                    break;
-                case nameof(CameraSettingsViewModel.RedFactor):
-                    redFactor = (int)_cameraSettings.RedFactor;
-                    break;
-                case nameof(CameraSettingsViewModel.BlueFactor):
-                    blueFactor = (int)_cameraSettings.BlueFactor;
-                    break;
+                switch (e.PropertyName)
+                {
+                    case nameof(CameraSettingsViewModel.Brightness):
+                        _capture.Set(Emgu.CV.CvEnum.CapProp.Brightness, _cameraSettings.Brightness);
+                        break;
+
+                    case nameof(CameraSettingsViewModel.Sharpness):
+                        _capture.Set(Emgu.CV.CvEnum.CapProp.Sharpness, _cameraSettings.Sharpness);
+                        break;
+
+                    case nameof(CameraSettingsViewModel.RedFactor):
+                        redFactor = (int)_cameraSettings.RedFactor;
+                        break;
+
+                    case nameof(CameraSettingsViewModel.BlueFactor):
+                        blueFactor = (int)_cameraSettings.BlueFactor;
+                        break;
+
+                    case nameof(CameraSettingsViewModel.WhiteBalance):
+                        whiteBalanceFactor = (int)_cameraSettings.WhiteBalance;
+                        break;
+                }
+            }
+            catch
+            {
+                // если камера не поддерживает WB, просто игнорируем
             }
         }
+
 
     }
 }
