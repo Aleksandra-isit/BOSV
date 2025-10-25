@@ -152,6 +152,7 @@ namespace TryCameraEnguCV
                 _videoWriter?.Dispose();
                 _videoWriter = null;
                 MessageBox.Show("Запись остановлена", "Видео", MessageBoxButton.OK, MessageBoxImage.Information);
+                _settingsMenu.LoadMedia();
             }
         }
 
@@ -228,6 +229,8 @@ namespace TryCameraEnguCV
                 }
 
                 MessageBox.Show($"Скриншот сохранён: {fileName}", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                _settingsMenu.LoadMedia();
+
             }
             catch (Exception ex)
             {

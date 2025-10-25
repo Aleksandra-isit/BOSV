@@ -54,6 +54,9 @@ namespace TryCameraEnguCV
             Application.Current.MainWindow = this;
 
             _comController = new ComController("COM3", 9600);
+            _comController.LightOn = true;
+            _comController.CurrentBrightness = 1; // или нужное значение
+            _comController.SetBrightness(1);      // реально отправляем на устройство
             _comController.DataReceived += msg =>
             {
                 // Можно выводить в Debug или TextBox в UI через Dispatcher

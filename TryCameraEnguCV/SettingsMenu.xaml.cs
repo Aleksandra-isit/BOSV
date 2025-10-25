@@ -51,6 +51,9 @@ namespace TryCameraEnguCV
         private bool _uiAdjustingBrightness = false;       // пользователь двигает слайдер
         private int _lastBrightnessSentToUi = -1;          // последняя синхронизированная яркость
         private readonly ComController _comController;
+
+        private bool _uiInitialized = false;
+
         public SettingsMenu(ComController comController)
         {
             InitializeComponent();
@@ -62,10 +65,16 @@ namespace TryCameraEnguCV
 
 
             _comController = comController;
+            BOSVToggle.IsChecked = _comController.LightOn; // уже включён
+            BOSVSlider.Value = _comController.CurrentBrightness;
+
+            _uiInitialized = true;
 
             // --- Подписка на COM-ответы ---
             _comController.DataReceived += hex =>
             {
+                if (!_uiInitialized) return;
+
                 Dispatcher.Invoke(() =>
                 {
                     int brightnessFromBlock = _comController.CurrentBrightness;
@@ -162,8 +171,7 @@ namespace TryCameraEnguCV
             _updatingFromUi = false;
         }
 
-
-        private void LoadMedia()
+        public void LoadMedia()
         {
             if (!Directory.Exists(folder)) return;
 
@@ -234,7 +242,6 @@ namespace TryCameraEnguCV
 
             return bitmap;
         }
-
 
         private void Image_DoubleClick(object sender, MouseButtonEventArgs e)
         {
