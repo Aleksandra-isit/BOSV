@@ -152,7 +152,15 @@ namespace TryCameraEnguCV
                 _videoWriter?.Dispose();
                 _videoWriter = null;
                 MessageBox.Show("Запись остановлена", "Видео", MessageBoxButton.OK, MessageBoxImage.Information);
-                _settingsMenu.LoadMedia();
+
+                // --- безопасный вызов LoadMedia ---
+                if (_settingsMenu == null)
+                {
+                    _settingsMenu = new SettingsMenu(_comController); // создаём окно
+                    _settingsMenu.Show(); // показываем, если нужно
+                }
+
+                _settingsMenu.LoadMedia(); // теперь точно не упадёт
             }
         }
 
@@ -229,7 +237,15 @@ namespace TryCameraEnguCV
                 }
 
                 MessageBox.Show($"Скриншот сохранён: {fileName}", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                _settingsMenu.LoadMedia();
+
+                // --- безопасный вызов LoadMedia ---
+                if (_settingsMenu == null)
+                {
+                    _settingsMenu = new SettingsMenu(_comController); // создаём окно
+                    _settingsMenu.Show(); // показываем, если нужно
+                }
+
+                _settingsMenu.LoadMedia(); // теперь точно не упадёт
 
             }
             catch (Exception ex)
