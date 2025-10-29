@@ -50,6 +50,102 @@ namespace TryCameraEnguCV
         private bool _hasFrameErrorShown = false;
         private bool _isCameraActive = true;
 
+        private CancellationTokenSource _cameraLoopCts;
+        private int _emptyFrameCount = 0;
+        private const int MaxEmptyFrames = 5; // переподключаем после 5 пустых кадров
+
+        private DateTime _lastFrameTime = DateTime.Now;
+        private const int MaxNoFrameMs = 2000; // 2 секунды без новых кадров — перезапуск
+
+        private void StartCameraLoop()
+        {
+            _cameraLoopCts = new CancellationTokenSource();
+            var token = _cameraLoopCts.Token;
+
+            Task.Run(async () =>
+            {
+                const int targetFps = 30;
+                int frameDelay = 1000 / targetFps;
+
+                while (!token.IsCancellationRequested)
+                {
+                    if (_capture == null)
+                    {
+                        await Task.Delay(frameDelay);
+                        continue;
+                    }
+
+                    using var frame = _capture.QueryFrame();
+
+                    if (frame == null || frame.IsEmpty)
+                    {
+                        // Если долго нет новых кадров — перезапускаем камеру
+                        if ((DateTime.Now - _lastFrameTime).TotalMilliseconds > MaxNoFrameMs)
+                        {
+                            RestartCamera();
+                            _lastFrameTime = DateTime.Now; // сбрасываем таймер
+                            await Task.Delay(1000);
+                            continue;
+                        }
+
+                        await Task.Delay(frameDelay);
+                        continue;
+                    }
+
+                    // кадр получен успешно
+                    _lastFrameTime = DateTime.Now;
+
+                    using var image = frame.ToImage<Bgr, byte>();
+                    using var adjusted = ApplyAllAdjustments(
+                        image,
+                        _cameraSettings.Saturation,
+                        blueFactor,
+                        redFactor,
+                        whiteBalanceFactor
+                    );
+
+                    await Dispatcher.BeginInvoke(() =>
+                    {
+                        if (!isFreezeFrame)
+                            BitmapSourceConvertFast.UpdateBitmapFromMat(adjusted.Mat, _cameraBitmap);
+                        else if (frozenFrame != null)
+                            BitmapSourceConvertFast.UpdateBitmapFromMat(frozenFrame, _cameraBitmap);
+                    });
+
+                    await Task.Delay(frameDelay);
+                }
+            }, token);
+        }
+
+
+        private void StopCameraLoop()
+        {
+            _cameraLoopCts?.Cancel();
+        }
+
+        private void RestartCamera()
+        {
+            try
+            {
+                _capture?.Dispose();
+                _capture = new VideoCapture(0);
+
+                if (_capture != null && _capture.IsOpened)
+                {
+                    _capture.Set(Emgu.CV.CvEnum.CapProp.FrameWidth, 1920);
+                    _capture.Set(Emgu.CV.CvEnum.CapProp.FrameHeight, 1080);
+                }
+
+                //Debug.WriteLine("Камера переподключена");
+                Logger.Write("Камера переподключена");
+            }
+            catch (Exception ex)
+            {
+                //Debug.WriteLine($"Ошибка при переподключении камеры: {ex.Message}");
+                Logger.Write($"Ошибка при переподключении камеры: {ex.Message}");
+            }
+        }
+
         // Отрисовка и обработка кадров
         private void UpdateCameraFrameFast(object? sender, EventArgs e)
         {

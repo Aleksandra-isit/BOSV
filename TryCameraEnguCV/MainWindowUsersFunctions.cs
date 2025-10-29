@@ -197,7 +197,7 @@ namespace TryCameraEnguCV
             try
             {
                 // ⏹ Отключаем все визуальные обновления
-                CompositionTarget.Rendering -= UpdateCameraFrameFast;
+                //CompositionTarget.Rendering -= UpdateCameraFrameFast;
 
                 // ⏱ Останавливаем таймеры
                 _timer?.Stop();
@@ -205,6 +205,7 @@ namespace TryCameraEnguCV
 
                 // 🎥 Освобождаем ресурсы камеры
                 _isCameraActive = false;
+                StopCameraLoop();
                 _capture?.Dispose();
 
                 // 🔌 Завершаем COM

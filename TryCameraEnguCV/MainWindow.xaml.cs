@@ -116,10 +116,13 @@ namespace TryCameraEnguCV
                 cameraImage.Source = _cameraBitmap;
 
                 // Подписка на CompositionTarget.Rendering для плавного видео
-                CompositionTarget.Rendering += (s, e) =>
-                {
-                    UpdateCameraFrameFast(s, e);
-                };
+                //CompositionTarget.Rendering += (s, e) =>
+                //{
+                //    UpdateCameraFrameFast(s, e);
+                //};
+
+                // --- Запуск стабильного цикла камеры ---
+                StartCameraLoop();
             }
             else
             {
