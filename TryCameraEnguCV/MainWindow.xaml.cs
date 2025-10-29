@@ -64,7 +64,7 @@ namespace TryCameraEnguCV
                 {
                 });
             };
-            _comController.Start();
+            //_comController.Start();
 
             // Загружаемся под профилем нужного врача
             _currentUser = user;

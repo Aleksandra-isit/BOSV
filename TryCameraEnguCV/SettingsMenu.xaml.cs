@@ -423,11 +423,11 @@ namespace TryCameraEnguCV
 
         private void AutoWhiteBalance(object sender, RoutedEventArgs e)
         {
-            if (AppConstants.isAutoWBCounted == true)
-            {
-                WhiteBalanceSlider.Value = AppConstants.wbResultFactor;
-            }
-            AppConstants.isAutoWBCounted = false;
+            // при нажатии включаем пересчёт
+            AppConstants.AutoWBRequested = true;
+            AppConstants.AutoWBActive = true;
+
+            Debug.WriteLine("Запрошен авто баланс белого");
         }
     }
 }

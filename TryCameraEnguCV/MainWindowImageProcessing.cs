@@ -402,10 +402,9 @@ namespace TryCameraEnguCV
             int width = result.Width;
             int height = result.Height;
             int stride = width * 3;
-
             byte* ptr = (byte*)result.Mat.DataPointer;
 
-            // --- 0. Программный баланс белого (Gray World, выборка каждые 4 пикселя) ---
+            // --- вычисляем средние значения каналов ---
             double sumR = 0, sumG = 0, sumB = 0;
             int count = 0;
             for (int y = 0; y < height; y += 4)
@@ -419,62 +418,57 @@ namespace TryCameraEnguCV
                     count++;
                 }
             }
+
             double avgR = sumR / count;
             double avgG = sumG / count;
             double avgB = sumB / count;
 
-            double wbOffset = (wbFactor - 4650) / 1850;
-            double kR = avgG / avgR * (1.0 + 0.2 * wbOffset);
-            double kB = avgG / avgB * (1.0 - 0.2 * wbOffset);
-
-            double k1 = 0, d = 0, k2 = 0;
-            // считаем дефолтное значение 
-            if (AppConstants.isDefaultWBCounted == false)
-            {
-                AppConstants.wbDefaultOffset = wbOffset;
-                AppConstants.kRedDefault = kR;
-                AppConstants.kBlueDefault = kB;
-
-                AppConstants.isDefaultWBCounted = true; // больше дефолтное значение считать не надо
-
-                k1 = AppConstants.kRedDefault * AppConstants.avgRedDefalt;
-                k2 = AppConstants.kBlueDefault * AppConstants.avgBlueDefalt;
-
-                d = AppConstants.avgGreenDefalt * (1 + 0.2 * AppConstants.wbDefaultOffset);
-            }
-
-            if (AppConstants.isAutoWBCounted == false)
-            {
-                double wbOffsetRed = ((d * kR * avgR / k1 * avgG) - 1) / 0.2;
-                double wbOffsetBlue = ((d * kB * avgB / k2 * avgG) - 1) / 0.2;
-                wbOffset = (wbOffsetRed + wbOffsetBlue) / 2;
-                wbFactor = wbOffset * 1850 + 4650;
-                AppConstants.wbResultFactor = wbFactor;
-
-                AppConstants.isAutoWBCounted = true;
-            }
-
-            double blueFactor = 1.0 + (blueFactorRaw / 20.0);
+            double kR = 1.0, kB = 1.0;
             double redFactor = 1.0 + (redFactorRaw / 20.0);
+            double blueFactor = 1.0 + (blueFactorRaw / 20.0);
 
-            // --- проход по всем пикселям один раз ---
+            // --- авто баланс белого ---
+            if (AppConstants.AutoWBRequested)
+            {
+                kR = avgG / avgR;
+                kB = avgG / avgB;
+
+                // мягкая стабилизация, чтобы картинка не прыгала сильно
+                kR = 0.8 * kR + 0.2;
+                kB = 0.8 * kB + 0.2;
+
+                AppConstants.kRedAuto = kR;
+                AppConstants.kBlueAuto = kB;
+
+                AppConstants.AutoWBRequested = false;
+                AppConstants.AutoWBActive = true;
+
+                Debug.WriteLine($"Новый авто WB: kR={kR:F3}, kB={kB:F3}");
+            }
+            else if (AppConstants.AutoWBActive)
+            {
+                kR = AppConstants.kRedAuto;
+                kB = AppConstants.kBlueAuto;
+            }
+
+            // --- применяем WB и ручные корректировки ---
             for (int y = 0; y < height; y++)
             {
                 byte* row = ptr + y * stride;
                 for (int x = 0; x < width; x++)
                 {
                     int idx = x * 3;
-
-                    // WB + красно-синяя корректировка
                     int b = (int)(row[idx + 0] * kB * blueFactor);
+                    int g = (int)(row[idx + 1] * 1.0); // зелёный остаётся как эталон
                     int r = (int)(row[idx + 2] * kR * redFactor);
 
                     row[idx + 0] = (byte)Math.Clamp(b, 0, 255);
+                    row[idx + 1] = (byte)Math.Clamp(g, 0, 255);
                     row[idx + 2] = (byte)Math.Clamp(r, 0, 255);
                 }
             }
 
-            // --- 1. Насыщенность ---
+            // --- насыщенность ---
             if (Math.Abs(saturationFactor - 1.0) > 0.001)
             {
                 using var hsv = result.Convert<Hsv, byte>();

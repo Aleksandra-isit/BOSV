@@ -8,18 +8,9 @@ namespace TryCameraEnguCV
 {
     public static class AppConstants
     {
-        public static double avgGreenDefalt { get; set; } 
-        public static double avgRedDefalt { get; set; }
-        public static double avgBlueDefalt { get; set; }
-
-        public static double kRedDefault { get; set; }
-        public static double kBlueDefault { get; set; }
-
-        public static double wbDefaultOffset { get; set; } = (3421 - 4650) / 1850;
-        public static double wbResultFactor { get; set; } = 0;
-
-        public static bool isDefaultWBCounted { get; set; } = false;
-        public static bool isAutoWBCounted { get; set; } = true;
-
+        public static bool AutoWBRequested { get; set; } = false; // запрос пересчёта
+        public static double kRedAuto { get; set; } = 1.0;
+        public static double kBlueAuto { get; set; } = 1.0;
+        public static bool AutoWBActive { get; set; } = false;   // активен ли авто-баланс
     }
 }
