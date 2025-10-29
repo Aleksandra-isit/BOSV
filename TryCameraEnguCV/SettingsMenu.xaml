@@ -50,7 +50,7 @@
                 </Button>
 
             </Grid>
-            
+
             <Grid Grid.Row="1">
                 <DockPanel>
 
@@ -92,8 +92,9 @@
 
                         <!-- Установки изображения -->
                         <TabItem Header="Установки изображения">
-                            <Grid Margin="5,0,5,0">
+                            <Grid Margin="5,0,5,0" HorizontalAlignment="Center">
                                 <Grid.RowDefinitions>
+                                    <RowDefinition Height="50"/>
                                     <RowDefinition Height="50"/>
                                     <RowDefinition Height="50"/>
                                     <RowDefinition Height="50"/>
@@ -103,61 +104,65 @@
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="110"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="102"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="31"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Яркость:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
-                                <Slider x:Name="BrightnessSlider" Grid.Row="0" Grid.Column="1" Minimum="-50" Maximum="50" 
+                                <TextBlock Grid.Column="0" Text="Яркость:" Foreground="White" VerticalAlignment="Center" FontSize="14" Height="18"/>
+                                <Slider x:Name="BrightnessSlider" Grid.Column="1" Minimum="-50" Maximum="50" 
                                         Value="{Binding Brightness, Mode=TwoWay}" 
                                         VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"
-                                        TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
-                                <TextBlock Grid.Row="0" Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
-                                        Text="{Binding Value, ElementName=BrightnessSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center"/>
+                                        TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" Height="14"/>
+                                <TextBlock Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
+                                        Text="{Binding Value, ElementName=BrightnessSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center" Height="18" Width="8"/>
 
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Цвет красный:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Цвет красный:" Foreground="White" VerticalAlignment="Center" FontSize="14" Height="18"/>
                                 <Slider x:Name="RedColorSlider" Grid.Row="1" Grid.Column="1" Minimum="-20" Maximum="20"
                                         Value="{Binding RedFactor, Mode=TwoWay}" 
                                         VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"
-                                        TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+                                        TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" Height="14"/>
                                 <TextBlock Grid.Row="1" Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
-                               Text="{Binding Value, ElementName=RedColorSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center"/>
+                               Text="{Binding Value, ElementName=RedColorSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center" Height="18" Width="8"/>
 
 
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Цвет синий:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Цвет синий:" Foreground="White" VerticalAlignment="Center" FontSize="14" Height="18"/>
                                 <Slider x:Name="BlueColorSlider" Grid.Row="2" Grid.Column="1" Minimum="-20" Maximum="20"
                                         Value="{Binding BlueFactor, Mode=TwoWay}" 
                                         VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"
-                                        TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+                                        TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" Height="14"/>
                                 <TextBlock Grid.Row="2" Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
-                               Text="{Binding Value, ElementName=BlueColorSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center"/>
+                               Text="{Binding Value, ElementName=BlueColorSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center" Height="18" Width="8"/>
 
 
-                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Четкость:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Четкость:" Foreground="White" VerticalAlignment="Center" FontSize="14" Height="18"/>
                                 <Slider x:Name="SharpnessSlider" Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="20"
                                         Value="{Binding Sharpness, Mode=TwoWay}" 
                                         VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"
-                                        TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+                                        TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" Height="14"/>
                                 <TextBlock Grid.Row="3" Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
-                               Text="{Binding Value, ElementName=SharpnessSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center"/>
+                               Text="{Binding Value, ElementName=SharpnessSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center" Height="18" Width="8"/>
 
 
-                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Насыщенность:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Насыщенность:" Foreground="White" VerticalAlignment="Center" FontSize="14" Height="18"/>
                                 <Slider x:Name="SaturationSlider" Grid.Row="4" Grid.Column="1" Minimum="0" Maximum="2" TickFrequency="0.1"
                                         Value="{Binding Saturation, Mode=TwoWay}" 
                                         VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"
-                                        IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+                                        IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" Height="14"/>
                                 <TextBlock Grid.Row="4" Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
-                               Text="{Binding Value, ElementName=SaturationSlider, StringFormat={}{0:F1}}" HorizontalAlignment="Center"/>
+                               Text="{Binding Value, ElementName=SaturationSlider, StringFormat={}{0:F1}}" HorizontalAlignment="Center" Height="18" Width="18"/>
 
-                                <TextBlock Grid.Row="5" Grid.Column="0" Text="Баланс белого:" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
+                                <TextBlock Grid.Row="5" Grid.Column="0" Text="Баланс белого:" Foreground="White" VerticalAlignment="Center" FontSize="14" Height="18"/>
                                 <Slider x:Name="WhiteBalanceSlider" Grid.Row="5" Grid.Column="1" Minimum="2800" Maximum="6500" TickFrequency="1"
                                         Value="{Binding WhiteBalance, Mode=TwoWay}" 
                                         VerticalAlignment="Center" Style="{StaticResource DarkSliderStyle}"
-                                        IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+                                        IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" Height="14"/>
                                 <TextBlock Grid.Row="5" Grid.Column="2" Foreground="White" FontSize="14" VerticalAlignment="Center"
-                               Text="{Binding Value, ElementName=WhiteBalanceSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center"/>
+                               Text="{Binding Value, ElementName=WhiteBalanceSlider, StringFormat={}{0:F0}}" HorizontalAlignment="Center" Height="18" Width="30"/>
+
+                                <Button x:Name="AutoWhiteBalanceBtn" Grid.Row="6" Grid.Column="1" Content="Авто баланс белого" Background="Crimson" 
+                                Foreground="White" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Top" Padding="5" Height="31" Width="139" Click="AutoWhiteBalance"/>
+
 
                             </Grid>
                         </TabItem>
@@ -462,5 +467,5 @@
                 </DockPanel>
             </Grid>
         </Grid>
-    </Border>        
+    </Border>
 </Window>

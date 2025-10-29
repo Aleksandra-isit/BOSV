@@ -427,6 +427,33 @@ namespace TryCameraEnguCV
             double kR = avgG / avgR * (1.0 + 0.2 * wbOffset);
             double kB = avgG / avgB * (1.0 - 0.2 * wbOffset);
 
+            double k1 = 0, d = 0, k2 = 0;
+            // считаем дефолтное значение 
+            if (AppConstants.isDefaultWBCounted == false)
+            {
+                AppConstants.wbDefaultOffset = wbOffset;
+                AppConstants.kRedDefault = kR;
+                AppConstants.kBlueDefault = kB;
+
+                AppConstants.isDefaultWBCounted = true; // больше дефолтное значение считать не надо
+
+                k1 = AppConstants.kRedDefault * AppConstants.avgRedDefalt;
+                k2 = AppConstants.kBlueDefault * AppConstants.avgBlueDefalt;
+
+                d = AppConstants.avgGreenDefalt * (1 + 0.2 * AppConstants.wbDefaultOffset);
+            }
+
+            if (AppConstants.isAutoWBCounted == false)
+            {
+                double wbOffsetRed = ((d * kR * avgR / k1 * avgG) - 1) / 0.2;
+                double wbOffsetBlue = ((d * kB * avgB / k2 * avgG) - 1) / 0.2;
+                wbOffset = (wbOffsetRed + wbOffsetBlue) / 2;
+                wbFactor = wbOffset * 1850 + 4650;
+                AppConstants.wbResultFactor = wbFactor;
+
+                AppConstants.isAutoWBCounted = true;
+            }
+
             double blueFactor = 1.0 + (blueFactorRaw / 20.0);
             double redFactor = 1.0 + (redFactorRaw / 20.0);
 

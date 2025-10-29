@@ -420,5 +420,14 @@ namespace TryCameraEnguCV
             // Генерируем событие
             ResetSettingsRequested?.Invoke();
         }
+
+        private void AutoWhiteBalance(object sender, RoutedEventArgs e)
+        {
+            if (AppConstants.isAutoWBCounted == true)
+            {
+                WhiteBalanceSlider.Value = AppConstants.wbResultFactor;
+            }
+            AppConstants.isAutoWBCounted = false;
+        }
     }
 }
